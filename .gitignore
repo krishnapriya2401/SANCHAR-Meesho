@@ -1,0 +1,16 @@
+# Backend
+sanchar_backend/venv/
+sanchar_backend/__pycache__/
+*.pyc
+sanchar_backend/db.sqlite3
+
+sanchar_backend/staticfiles/
+
+# Frontend
+sanchar-frontend/node_modules/
+sanchar-frontend/dist/
+
+
+# Root virtual environment
+venv/
+.env
