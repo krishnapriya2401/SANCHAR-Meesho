@@ -91,28 +91,10 @@ WSGI_APPLICATION = 'sanchar_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-import re
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL:
-    m = re.match(r"postgres(?:ql)?://(.+?):(.+?)@(.+?)(?::(\d+))?/(.+?)$", DATABASE_URL)
-    if m:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': m.group(5),
-                'USER': m.group(1),
-                'PASSWORD': m.group(2),
-                'HOST': m.group(3),
-                'PORT': m.group(4) if m.group(4) else '5432',
-            }
-        }
-    else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        }
+    import dj_database_url
+    DATABASES = {"default": dj_database_url.config(default=DATABASE_URL, conn_max_age=600)}
 else:
     DATABASES = {
         'default': {
