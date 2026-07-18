@@ -1,9 +1,12 @@
+import os
+
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status as http_status
 from django.core.mail import send_mail
+from django.core.management import call_command
 
 
 from core.models import Order
@@ -142,6 +145,29 @@ class RerunLiveView(APIView):
             "diagnosis_verdict": result.get("diagnosis_verdict"),
             "action_taken": result.get("action_taken"),
         })
+
+
+class SetupView(APIView):
+    """POST /api/setup/  ->  generate_data + run_pipeline (one-time setup).
+    Send JSON: {"key": "...", "force": false}
+    """
+
+    def post(self, request):
+        key = request.data.get("key")
+        expected = os.getenv("SETUP_KEY", "")
+        if not expected or key != expected:
+            return Response({"error": "invalid key"}, status=http_status.HTTP_403_FORBIDDEN)
+        force = request.data.get("force", False)
+        if Order.objects.count() > 0 and not force:
+            return Response({"message": "data already exists, skipping"})
+        try:
+            if force:
+                call_command("flush", "--no-input")
+            call_command("generate_data")
+            call_command("run_pipeline")
+            return Response({"message": "setup complete"})
+        except Exception as e:
+            return Response({"error": str(e)}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ApproveCourierView(APIView):
