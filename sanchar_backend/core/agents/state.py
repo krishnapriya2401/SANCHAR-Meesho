@@ -4,6 +4,15 @@ class AgentTraceDict(TypedDict):
     agent: str
     output: str
 
+class MetricDict(TypedDict):
+    label: str
+    value: str
+
+class AgentOutput(TypedDict):
+    summary: str
+    metrics: List[MetricDict]
+    carries_forward: str
+
 class SancharState(TypedDict):
     order_id: str
     courier: str
@@ -21,16 +30,19 @@ class SancharState(TypedDict):
 
     monitor_flagged: Optional[bool]
     monitor_reason: Optional[str]
+    monitor_output: Optional[AgentOutput]
 
     failure_detected: Optional[bool]
     failure_type: Optional[str]
 
-    diagnosis_cause: Optional[str]            # added — Mode 1 output
-    diagnosis_verdict: Optional[str]          # Mode 2 output
-    diagnosis_confidence: Optional[float]     # currently unused, kept for future
+    diagnosis_cause: Optional[str]
+    diagnosis_verdict: Optional[str]
+    diagnosis_confidence: Optional[float]
     diagnosis_explanation: Optional[str]
+    diagnosis_output: Optional[AgentOutput]
 
     action_taken: Optional[str]
-    action_detail: Optional[str]              # added — action.py sets this
+    action_detail: Optional[str]
+    action_output: Optional[AgentOutput]
 
     trace: List[AgentTraceDict]

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import styles from "../styles/AgentTraceConsole.module.css";
 
 const AGENT_META = {
   monitor: { icon: "🔍", label: "Monitor Agent", color: "#5bc0de" },
@@ -6,11 +7,6 @@ const AGENT_META = {
   action: { icon: "⚡", label: "Action Agent", color: "#5cb85c" },
 };
 
-/**
- * Reveals trace steps one at a time with a short delay, so it reads like a live
- * process happening rather than a static list. Pass `autoPlay={false}` to show
- * everything instantly (e.g. when just re-opening an already-viewed order).
- */
 export default function AgentTraceConsole({ traces, autoPlay = true, stepDelayMs = 800 }) {
   const [visibleCount, setVisibleCount] = useState(autoPlay ? 0 : traces.length);
 
@@ -27,42 +23,24 @@ export default function AgentTraceConsole({ traces, autoPlay = true, stepDelayMs
   }, [traces, autoPlay, stepDelayMs]);
 
   return (
-    <div style={{
-      background: "#1e1e1e", borderRadius: "8px", padding: "1.25rem",
-      fontFamily: "'SF Mono', 'Consolas', monospace", fontSize: "0.9rem",
-      minHeight: "80px",
-    }}>
+    <div className={styles.container}>
       {traces.slice(0, visibleCount).map((t, i) => {
         const meta = AGENT_META[t.agent] || { icon: "🤖", label: t.agent, color: "#999" };
         return (
-          <div
-            key={i}
-            style={{
-              marginBottom: "1rem",
-              animation: "fadeSlideIn 0.4s ease-out",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-              <span>{meta.icon}</span>
-              <span style={{ color: meta.color, fontWeight: 700 }}>{meta.label}</span>
-              {i < visibleCount - 1 && <span style={{ color: "#555" }}> — done</span>}
+          <div key={i} className={styles.trace} style={{ animation: "fadeSlideIn 0.4s ease-out" }}>
+            <div className={styles.header}>
+              <span className={styles.icon}>{meta.icon}</span>
+              <span className={styles.agentName} style={{ color: meta.color }}>{meta.label}</span>
+              {i < visibleCount - 1 && <span className={styles.doneTag}> — done</span>}
             </div>
-            <div style={{ color: "#d4d4d4", paddingLeft: "26px" }}>{t.output}</div>
+            <div className={styles.output}>{t.output}</div>
             {i < traces.length - 1 && i === visibleCount - 1 && (
-              <div style={{ paddingLeft: "26px", color: "#666", marginTop: "4px" }}>↓ passing to next agent...</div>
+              <div className={styles.passing}>↓ passing to next agent...</div>
             )}
           </div>
         );
       })}
-      {visibleCount < traces.length && (
-        <div style={{ color: "#666" }}>...</div>
-      )}
-      <style>{`
-        @keyframes fadeSlideIn {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+      {visibleCount < traces.length && <div className={styles.ellipsis}>...</div>}
     </div>
   );
 }

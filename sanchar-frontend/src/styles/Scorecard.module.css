@@ -1,0 +1,172 @@
+.page {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0d1117;
+  min-height: 100vh;
+  color: #e6edf3;
+}
+
+.title {
+  margin: 0 0 4px 0;
+  font-size: 1.3rem;
+}
+
+.subtitle {
+  color: #8b949e;
+  font-size: 0.85rem;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.section {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  margin: 0 0 16px 0;
+  font-size: 0.85rem;
+  color: #e6edf3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summaryText {
+  color: #c9d1d9;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.statsRow {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.statCard {
+  flex: 1;
+  min-width: 120px;
+  background: #0d1117;
+  border-radius: 6px;
+  padding: 12px 16px;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e6edf3;
+  font-family: 'SF Mono', monospace;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  color: #8b949e;
+  margin-top: 2px;
+}
+
+.regionTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.regionTable th {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid #30363d;
+  color: #8b949e;
+}
+
+.regionTableTh {
+  text-align: right;
+  padding: 8px 12px;
+  border-bottom: 1px solid #30363d;
+  color: #8b949e;
+}
+
+.regionCell {
+  padding: 8px 12px;
+  border-bottom: 1px solid #21262d;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+.regionCellRight {
+  padding: 8px 12px;
+  border-bottom: 1px solid #21262d;
+  text-align: right;
+  font-family: 'SF Mono', monospace;
+  color: #e6edf3;
+}
+
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.actionCard {
+  background: #0d1117;
+  border-radius: 6px;
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.actionCardLabel {
+  font-size: 0.72rem;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.actionCardCount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #e6edf3;
+  font-family: 'SF Mono', monospace;
+  margin-top: 4px;
+}
+
+.actionCardImpact {
+  font-size: 0.72rem;
+  margin-top: 2px;
+}
+
+.regionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.regionCard {
+  background: #0d1117;
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+
+.regionName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+.regionStats {
+  font-size: 0.72rem;
+  color: #8b949e;
+  margin-top: 4px;
+}
+
+.savingsFooter {
+  margin-top: 10px;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  font-size: 0.8rem;
+}

@@ -1,0 +1,79 @@
+.page {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #0d1117;
+  min-height: 100vh;
+  color: #e6edf3;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.backLink {
+  color: #58a6ff;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.separator {
+  color: #8b949e;
+}
+
+.orderTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.statusBadge {
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #8b949e;
+}
+
+.error {
+  text-align: center;
+  padding: 3rem;
+  color: #da3633;
+}
+
+.traceSection {
+  margin-top: 1.5rem;
+}
+
+.traceLabel {
+  color: #8b949e;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid #30363d;
+  border-top-color: #58a6ff;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

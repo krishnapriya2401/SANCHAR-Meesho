@@ -1,75 +1,107 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { fetchOrderDetail, rerunLive } from "../api";
-import AgentTraceConsole from "../components/AgentTraceConsole";
-import ClaimVsEvidence from "../components/ClaimVsEvidence";
-import { useToast } from "../components/Toast";
+import { useParams, Link } from "react-router-dom";
+import { fetchOrderDetail } from "../api";
+import styles from "../styles/OrderDetail.module.css";
+
+function fmtTime(dt) {
+  if (!dt) return "\u2014";
+  const d = new Date(dt);
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) +
+    " " + d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+}
+
+function DetailRow({ label, value }) {
+  return (
+    <div className={styles.detailRow}>
+      <span className={styles.detailLabel}>{label}</span>
+      <span className={styles.detailValue}>{value || "\u2014"}</span>
+    </div>
+  );
+}
+
+function SectionCard({ title, children }) {
+  return (
+    <div className={styles.sectionCard}>
+      <div className={styles.sectionTitle}>{title}</div>
+      {children}
+    </div>
+  );
+}
 
 export default function OrderDetail() {
   const { orderId } = useParams();
   const [order, setOrder] = useState(null);
-  const [liveTraces, setLiveTraces] = useState(null);
-  const [running, setRunning] = useState(false);
-  const showToast = useToast();
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     fetchOrderDetail(orderId).then(setOrder);
   }, [orderId]);
 
-  if (!order) return <p style={{ padding: "1.5rem" }}>Loading...</p>;
+  if (!order) return <p style={{ padding: "1.5rem", color: "#8b949e" }}>Loading...</p>;
 
-  const isFalseClaim = order.diagnosis_verdict === "false_claim";
+  const statusColor = order.status === "in_transit" ? "#1f6feb"
+    : order.status === "delivered" ? "#238636" : "#da3633";
 
-  
-  const handleRunLive = async () => {
-  setRunning(true);
-  setLiveTraces(null);
-  const result = await rerunLive(order.order_id);
-  const fresh = [];
-  if (result.monitor_reason !== undefined) fresh.push({ agent: "monitor", output: result.monitor_reason || "On track, nothing flagged." });
-  if (result.diagnosis_explanation) fresh.push({ agent: "diagnosis", output: result.diagnosis_explanation });
-  if (result.action_detail) fresh.push({ agent: "action", output: result.action_detail });
-  setLiveTraces(fresh);
-  setRunning(false);
-  showToast(`Pipeline re-run complete for ${order.order_id}`);
-};
+  const isDelayed = order.monitor_flagged === true || ["rejected", "rto", "failed"].includes(order.status);
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "750px", margin: "0 auto", fontFamily: "system-ui, sans-serif" }}>
-      <h2 style={{ marginBottom: "0.25rem" }}>{order.order_id} — {order.courier}</h2>
-      <p style={{ color: "#666", marginTop: 0 }}>
-        Mode: <strong>{order.mode}</strong> · Status: <strong>{order.status}</strong>
-      </p>
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div className={styles.headerRow}>
+          <h2 className={styles.orderTitle}>{order.order_id}</h2>
+          <span className={styles.statusBadge} style={{ background: statusColor }}>
+            {order.status}
+          </span>
+          <span className={styles.courierTag}>{order.courier}</span>
+        </div>
 
-     {order.mode === "resolve" && <ClaimVsEvidence order={order} />}
-
-      <h3>Agent Trace (last pipeline run)</h3>
-      <AgentTraceConsole
-        traces={order.traces.map((t) => ({ agent: t.agent, output: t.output }))}
-        autoPlay={true}
-      />
-
-      <div style={{ marginTop: "1.5rem" }}>
-        <button
-          onClick={handleRunLive}
-          disabled={running}
-          style={{
-            padding: "10px 20px", borderRadius: "6px", border: "none",
-            background: running ? "#999" : "#333", color: "#fff", cursor: "pointer", fontSize: "0.95rem",
-          }}
-        >
-          {running ? "Running agents..." : "▶ Run Pipeline Live"}
-        </button>
-        <p style={{ color: "#888", fontSize: "0.85rem", marginTop: "6px" }}>
-          Re-invokes the real pipeline right now — a fresh Groq call happens live, watch it below.
-        </p>
+        <div className={styles.detailGrid}>
+          <SectionCard title="Customer">
+            <DetailRow label="Name" value={order.customer_name} />
+            <DetailRow label="Phone" value={order.customer_phone} />
+            <DetailRow label="Address" value={order.delivery_address} />
+          </SectionCard>
+          <SectionCard title="Order">
+            <DetailRow label="Item" value={order.item_name} />
+            <DetailRow label="Quantity" value={order.quantity != null ? String(order.quantity) : "\u2014"} />
+            <DetailRow label="Value" value={order.order_value != null ? `\u20b9${order.order_value.toLocaleString()}` : "\u2014"} />
+            <DetailRow label="Pincode" value={order.pincode} />
+          </SectionCard>
+          <SectionCard title="Delivery">
+            <DetailRow label="Status" value={order.status?.replace(/_/g, " ")} />
+            <DetailRow label="Courier" value={order.courier} />
+            <DetailRow label="Deadline" value={fmtTime(order.deadline)} />
+            <DetailRow label="Courier Reason" value={order.courier_reported_reason?.replace(/_/g, " ") || "\u2014"} />
+          </SectionCard>
+          <SectionCard title="Timeline">
+            <DetailRow label="Order Placed" value={fmtTime(order.order_placed_time)} />
+            <DetailRow label="Dispatched" value={fmtTime(order.dispatch_time)} />
+            <DetailRow label="Hub Arrival" value={fmtTime(order.current_hub_arrival_time)} />
+            <DetailRow label="Delivery Attempt" value={fmtTime(order.delivery_attempt_time)} />
+          </SectionCard>
+        </div>
       </div>
 
-      {liveTraces && (
-        <div style={{ marginTop: "1rem" }}>
-          <h3>Live Run Output</h3>
-          <AgentTraceConsole traces={liveTraces} autoPlay={true} />
+      {isDelayed ? (
+        <div className={styles.emailSection}>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter email to receive action result"
+            className={styles.emailInput}
+          />
+          <Link
+            to={`/orders/${order.order_id}/pipeline?email=${encodeURIComponent(email)}`}
+            className={styles.pipelineLink}
+          >
+            &#9654; Run Pipeline &amp; Notify
+          </Link>
         </div>
+      ) : (
+        <Link to={`/orders/${order.order_id}/pipeline`} className={styles.pipelineLink}>
+          &#9654; Run AI Pipeline
+        </Link>
       )}
     </div>
   );

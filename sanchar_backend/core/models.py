@@ -44,9 +44,17 @@ class Order(models.Model):
     diagnosis_confidence = models.FloatField(null=True, blank=True)
     diagnosis_explanation = models.TextField(null=True, blank=True)
     action_taken = models.CharField(max_length=50, null=True, blank=True)
-    
+
     action_detail = models.TextField(null=True, blank=True)
     current_hub_arrival_time = models.DateTimeField(null=True, blank=True)
+
+    # NEW — additive only, all nullable so old rows/mock data don't break
+    order_placed_time = models.DateTimeField(null=True, blank=True)
+    customer_name = models.CharField(max_length=100, null=True, blank=True)
+    customer_phone = models.CharField(max_length=15, null=True, blank=True)
+    delivery_address = models.TextField(null=True, blank=True)
+    item_name = models.CharField(max_length=200, null=True, blank=True)
+    quantity = models.IntegerField(null=True, blank=True, default=1)
 
     def __str__(self):
         return self.order_id
@@ -57,6 +65,13 @@ class AgentTrace(models.Model):
     agent = models.CharField(max_length=20)
     output = models.CharField(max_length=200)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+class PipelineClock(models.Model):
+    reference_time = models.DateTimeField()
+
+    class Meta:
+        verbose_name = "Pipeline Clock"
+        verbose_name_plural = "Pipeline Clock"
 
 class CourierApproval(models.Model):
     courier = models.CharField(max_length=50, unique=True)

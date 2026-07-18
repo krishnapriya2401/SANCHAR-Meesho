@@ -1,18 +1,50 @@
 from core.agents.groq_client import ask_groq_json
 
-# Deterministic cause buckets for Mode 1 — no ambiguity needed, courier/pincode patterns
-# are enough to categorize. LLM only writes the sentence on top of whichever bucket wins.
-CONGESTION_PINCODES = {"641001", "641002", "641037"}  # dense urban pincodes in synthetic data
+CONGESTION_PINCODES = {"641001", "641002", "641037"}
+
+CAUSE_META = {
+    "hub_congestion": {
+        "label": "Hub Congestion",
+        "impact": "Hub-level",
+        "summary_template": "Hub congestion from order surge — hub-level operational issue, not agent performance.",
+    },
+    "address_verification_hold": {
+        "label": "Address Verification Hold",
+        "impact": "Order-level",
+        "summary_template": "High-value order triggered address verification — order-specific hold, not hub-wide.",
+    },
+    "weather_or_transit_delay": {
+        "label": "Weather Disruption",
+        "impact": "Hub-level",
+        "summary_template": "Heavy rainfall reduced road visibility — hub-level weather disruption, not agent performance.",
+    },
+}
+
+VERDICT_META = {
+    "false_claim": {
+        "label": "False Claim",
+        "impact": "Courier-level",
+        "summary_template": "Courier claimed 'customer unavailable' but no call log — evidence mismatch, delivery likely not attempted.",
+    },
+    "genuine": {
+        "label": "Genuine Issue",
+        "impact": "Order-level",
+        "summary_template": "Courier report matches call log evidence — delivery failure is legitimate.",
+    },
+}
 
 
 def diagnosis_prevent(state: dict) -> dict:
-    """Mode 1: why is this stuck order actually stuck, and what should we tell the customer?"""
     if not state.get("monitor_flagged"):
         state["diagnosis_cause"] = None
         state["diagnosis_explanation"] = None
+        state["diagnosis_output"] = {
+            "summary": "No issue detected. Nothing to diagnose.",
+            "metrics": [],
+            "carries_forward": "no diagnosis needed",
+        }
         return state
 
-    # --- deterministic cause bucket (never LLM-decided) ---
     pincode = state["pincode"]
     if pincode in CONGESTION_PINCODES:
         cause = "hub_congestion"
@@ -22,8 +54,9 @@ def diagnosis_prevent(state: dict) -> dict:
         cause = "weather_or_transit_delay"
 
     state["diagnosis_cause"] = cause
+    meta = CAUSE_META[cause]
+    carries_from_monitor = state.get("monitor_output", {}).get("carries_forward", "unknown")
 
-    # --- LLM writes the explanation only ---
     fallback = {
         "explanation": f"Shipment delayed due to {cause.replace('_', ' ')}. Monitoring for further updates."
     }
@@ -35,11 +68,21 @@ def diagnosis_prevent(state: dict) -> dict:
         ),
         user_prompt=(
             f"Order {state['order_id']}, courier {state['courier']}, cause category: {cause}, "
-            f"reason detail: {state['monitor_reason']}."
+            f"monitor finding: {carries_from_monitor}."
         ),
         fallback=fallback,
     )
     state["diagnosis_explanation"] = result.get("explanation", fallback["explanation"])
+
+    summary = f"{meta['summary_template']} {state['diagnosis_explanation']}"
+    state["diagnosis_output"] = {
+        "summary": summary,
+        "metrics": [
+            {"label": "Root Cause", "value": meta["label"]},
+            {"label": "Impact", "value": meta["impact"]},
+        ],
+        "carries_forward": f"cause: {meta['label'].lower()}",
+    }
 
     state.setdefault("trace", []).append({
         "agent": "diagnosis",
@@ -49,24 +92,28 @@ def diagnosis_prevent(state: dict) -> dict:
 
 
 def diagnosis_resolve(state: dict) -> dict:
-    """Mode 2: cross-check courier's claim against call log. THE fraud-detection core loop."""
     if not state.get("failure_detected"):
         state["diagnosis_verdict"] = None
         state["diagnosis_explanation"] = None
+        state["diagnosis_output"] = {
+            "summary": "No failure detected. Nothing to diagnose.",
+            "metrics": [],
+            "carries_forward": "no diagnosis needed",
+        }
         return state
 
     reported_reason = state["courier_reported_reason"]
     call_logged = state["call_log_made"]
 
-    # --- deterministic fraud verdict (never LLM-decided) ---
     if reported_reason == "customer_unavailable" and not call_logged:
         verdict = "false_claim"
     else:
         verdict = "genuine"
 
     state["diagnosis_verdict"] = verdict
+    meta = VERDICT_META[verdict]
+    carries_from_monitor = state.get("monitor_output", {}).get("carries_forward", "unknown")
 
-    # --- LLM writes the explanation only ---
     fallback = {
         "explanation": (
             f"Courier reported '{reported_reason}' with no call log on record — flagged as a "
@@ -85,11 +132,21 @@ def diagnosis_resolve(state: dict) -> dict:
         user_prompt=(
             f"Order {state['order_id']}, failure type: {state['failure_type']}, "
             f"courier reported reason: '{reported_reason}', call_log_made: {call_logged}, "
-            f"verdict: {verdict}."
+            f"verdict: {verdict}, monitor finding: {carries_from_monitor}."
         ),
         fallback=fallback,
     )
     state["diagnosis_explanation"] = result.get("explanation", fallback["explanation"])
+
+    summary = f"{meta['summary_template']} {state['diagnosis_explanation']}"
+    state["diagnosis_output"] = {
+        "summary": summary,
+        "metrics": [
+            {"label": "Verdict", "value": meta["label"]},
+            {"label": "Impact", "value": meta["impact"]},
+        ],
+        "carries_forward": f"verdict: {verdict} → {state['diagnosis_explanation']}",
+    }
 
     state.setdefault("trace", []).append({
         "agent": "diagnosis",

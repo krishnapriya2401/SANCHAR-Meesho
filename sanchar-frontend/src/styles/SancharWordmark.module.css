@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandText {
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.tagline {
+  color: #8b949e;
+  margin-top: -2px;
+  letter-spacing: 0.3px;
+}

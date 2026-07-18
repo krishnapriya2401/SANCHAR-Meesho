@@ -1,0 +1,492 @@
+.page {
+  background: #0d1117;
+  color: #e6edf3;
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 6rem 1.5rem 4rem;
+}
+
+.heroGlow {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1000px;
+  height: 1000px;
+  background: radial-gradient(circle at center, rgba(88,166,255,0.18), rgba(63,185,80,0.08) 40%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.heroGrid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(48,54,61,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(48,54,61,0.15) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  max-width: 1100px;
+  width: 100%;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #30363d;
+  background: rgba(22, 27, 34, 0.6);
+  font-size: 0.75rem;
+  color: #8b949e;
+  margin-bottom: 1.5rem;
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3fb950;
+  box-shadow: 0 0 8px #3fb950;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: clamp(3.5rem, 9vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(180deg, #c9d1d9 0%, #8b949e 60%, #58a6ff 130%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0.85;
+}
+
+.heroSubtitle {
+  margin: 1.25rem auto 0;
+  max-width: 760px;
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  color: #c9d1d9;
+  font-weight: 500;
+}
+
+.heroDescription {
+  margin: 1rem auto 0;
+  max-width: 680px;
+  color: #8b949e;
+  font-size: 0.98rem;
+  line-height: 1.65;
+}
+
+/* ── Pipeline Agents ── */
+.pipelineWrapper {
+  margin: 2.5rem auto 0;
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.pipelineRow {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.agentSlot {
+  display: flex;
+  align-items: center;
+  flex: 1 1 180px;
+}
+
+.agentCard {
+  flex: 1;
+  border-radius: 10px;
+  padding: 14px 12px;
+  text-align: center;
+  animation: pipelinePulse 3s ease-in-out infinite;
+}
+
+.agentIcon {
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+
+.agentLabel {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.agentDivider {
+  width: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, #30363d, #484f58);
+  margin: 0 -1px;
+}
+
+.verticalConnector {
+  width: 2px;
+  height: 20px;
+  background: linear-gradient(180deg, #484f58, #7c3aed);
+}
+
+.aggregationCard {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 10px 24px;
+}
+
+.aggregationIcon {
+  font-size: 1.2rem;
+}
+
+.aggregationLabel {
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.aggregationHint {
+  color: #8b949e;
+  font-size: 0.7rem;
+}
+
+/* ── CTA Buttons ── */
+.ctaRow {
+  margin-top: 2.5rem;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #238636, #2ea043);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 24px rgba(35, 134, 54, 0.4);
+}
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  background: rgba(22, 27, 34, 0.6);
+  color: #e6edf3;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* ── Hero Stats ── */
+.heroStats {
+  margin-top: 3rem;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  color: #8b949e;
+  font-size: 0.85rem;
+  font-family: 'SF Mono', Consolas, monospace;
+}
+
+.heroStatDivider {
+  opacity: 0.4;
+}
+
+.heroStatStrong {
+  color: #e6edf3;
+}
+
+/* ── Sections (shared) ── */
+.section {
+  padding: 6rem 1.5rem;
+  border-top: 1px solid #21262d;
+}
+
+.sectionInner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sectionH2 {
+  margin: 0.5rem 0 3rem;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  max-width: 760px;
+}
+
+.grid320 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.spacer4 {
+  height: 4rem;
+}
+
+/* ── Eyebrow ── */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.eyebrowLine {
+  width: 24px;
+  height: 1px;
+}
+
+/* ── Cards (Problem / Solution) ── */
+.problemCard {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.problemCardTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+.problemCardBody {
+  margin: 0;
+  color: #8b949e;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.solutionCard {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.solutionCardIcon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.solutionCardTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e6edf3;
+}
+
+.solutionCardBody {
+  margin: 0;
+  color: #8b949e;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ── How it works ── */
+.howSection {
+  padding: 6rem 1.5rem;
+  border-top: 1px solid #21262d;
+  background: linear-gradient(180deg, #0d1117, #0a0d12);
+}
+
+.agentDetailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.agentDetailCard {
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.agentDetailGlow {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  filter: blur(20px);
+}
+
+.agentDetailContent {
+  position: relative;
+}
+
+.agentDetailHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.agentDetailIcon {
+  font-size: 1.5rem;
+}
+
+.agentDetailNumber {
+  font-family: 'SF Mono', Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.agentDetailTitle {
+  margin: 0.75rem 0 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.agentDetailBody {
+  margin: 0;
+  color: #c9d1d9;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ── Batch Intelligence ── */
+.batchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.batchCard {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.batchCardIcon {
+  font-size: 1.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.batchCardTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.batchCardBody {
+  margin: 0;
+  color: #8b949e;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.batchDesc {
+  margin: 0 0 2.5rem;
+  max-width: 720px;
+  color: #8b949e;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+/* ── Impact ── */
+.impactGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.impactCard {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 1.75rem 1.25rem;
+}
+
+.impactLabel {
+  font-size: 0.72rem;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.impactValue {
+  margin-top: 0.5rem;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 700;
+  font-family: 'SF Mono', Consolas, monospace;
+  letter-spacing: -0.02em;
+}
+
+.impactCta {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.impactCtaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: 1px solid #30363d;
+  background: #161b22;
+  color: #e6edf3;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* ── Footer ── */
+.footer {
+  padding: 2rem 1.5rem;
+  border-top: 1px solid #21262d;
+  text-align: center;
+  color: #8b949e;
+  font-size: 0.82rem;
+}
+
+/* ── Animations ── */
+@keyframes pipelinePulse {
+  0%, 100% { transform: translateY(0); filter: brightness(1); }
+  50% { transform: translateY(-3px); filter: brightness(1.15); }
+}

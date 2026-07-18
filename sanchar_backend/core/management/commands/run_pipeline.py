@@ -1,3 +1,4 @@
+import time
 from django.core.management.base import BaseCommand
 from core.models import Order, AgentTrace
 from core.agents.monitor import order_to_state
@@ -12,9 +13,17 @@ class Command(BaseCommand):
         graph = build_graph()
         processed = 0
 
-        for order in Order.objects.exclude(status="delivered"):
+        orders = list(Order.objects.exclude(status="delivered"))
+        for i, order in enumerate(orders):
+            self.stdout.write(f"[{i+1}/{len(orders)}] {order.order_id} ({order.status})...")
+            self.stdout.flush()
             state = order_to_state(order)
-            result = graph.invoke(state)
+            try:
+                result = graph.invoke(state)
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"  SKIPPED — {e}"))
+                continue
+            time.sleep(0.5)
 
             order.monitor_flagged = result.get("monitor_flagged")
             order.monitor_reason = result.get("monitor_reason")
@@ -26,7 +35,6 @@ class Command(BaseCommand):
             order.action_detail = result.get("action_detail")
             order.save()
 
-            # persist trace for the frontend Order Detail view (Day 5)
             AgentTrace.objects.filter(order=order).delete()
             for entry in result.get("trace", []):
                 AgentTrace.objects.create(
@@ -36,9 +44,10 @@ class Command(BaseCommand):
                 )
 
             processed += 1
+            self.stdout.write(self.style.SUCCESS(f"  done — flagged={result.get('monitor_flagged')} verdict={result.get('diagnosis_verdict') or result.get('diagnosis_cause') or '-'}"))
 
         self.stdout.write(self.style.SUCCESS(f"Pipeline complete. Processed {processed} orders."))
 
         agg = run_aggregation()
-        self.stdout.write(f"  Couriers scored: {len(agg['scorecard'])}")
-        self.stdout.write(f"  Flagged for human review: {agg['flagged_couriers']}")
+        self.stdout.write(f"  Root causes: {[r['cause'] for r in agg.get('root_cause', [])]}")
+        self.stdout.write(f"  Regions analyzed: {[r['region'] for r in agg.get('regional_risk', [])]}")

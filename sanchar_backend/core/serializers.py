@@ -29,8 +29,10 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             "order_id", "courier", "pincode", "order_value",
-            "dispatch_time", "deadline", "delivery_attempt_time",
+            "order_placed_time", "dispatch_time", "deadline", "delivery_attempt_time",   # order_placed_time added
             "current_hub_arrival_time", "status",
+            "customer_name", "customer_phone", "delivery_address",   # NEW
+            "item_name", "quantity",                                  # NEW
             "courier_reported_reason", "call_log_made", "delay_reason_true",
             "mode",
             "monitor_flagged", "monitor_reason",

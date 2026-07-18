@@ -2,11 +2,31 @@ import random
 from datetime import timedelta
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from core.models import Order, CourierBenchmark
+from core.models import Order, CourierBenchmark, PipelineClock
 
 COURIERS = ["DelhiveryX", "ShreeMaruti", "Ekart", "XpressBees", "BlueDart"]
 PINCODES = ["600001", "641001", "560001", "700001", "110001", "500001"]
+CUSTOMER_NAMES = [
+    "Ananya Sharma", "Rohan Mehta", "Priya Iyer", "Karthik Raman",
+    "Sneha Reddy", "Arjun Nair", "Divya Menon", "Vikram Singh",
+    "Meera Pillai", "Aditya Kumar",
+]
 
+ITEMS = [
+    ("Wireless Earbuds", "Electronics"),
+    ("Cotton Kurti", "Apparel"),
+    ("Non-stick Cookware Set", "Home"),
+    ("Running Shoes", "Footwear"),
+    ("Bluetooth Speaker", "Electronics"),
+    ("Skincare Combo", "Beauty"),
+    ("Backpack", "Accessories"),
+    ("Smartwatch", "Electronics"),
+]
+
+PINCODE_TO_CITY = {
+    "600001": "Chennai", "641001": "Coimbatore", "560001": "Bengaluru",
+    "700001": "Kolkata", "110001": "Delhi", "500001": "Hyderabad",
+}
 COURIER_FALSE_CLAIM_BIAS = {
     "BlueDart": 0.10,
     "DelhiveryX": 0.15,
@@ -28,6 +48,10 @@ class Command(BaseCommand):
 
         Order.objects.all().delete()
         CourierBenchmark.objects.all().delete()
+        PipelineClock.objects.all().delete()
+
+        now = timezone.now()
+        PipelineClock.objects.create(reference_time=now)
 
         benchmarks = {}
         for c in COURIERS:
@@ -42,15 +66,13 @@ class Command(BaseCommand):
                 "dispatch_to_delivery": dispatch_hours,
                 "hub_dwell_threshold": hub_dwell_hours,
             }
-
-        now = timezone.now()
         created = 0
 
         for i in range(n):
             order_id = f"ORD{1000+i}"
             courier = random.choice(COURIERS)
             pincode = random.choice(PINCODES)
-            order_value = random.choice([399, 599, 799, 999, 1499, 1999])
+            order_value = random.choice([399, 599, 799, 999, 1499, 1999, 4999, 7999])
 
             outcome_base = random.choices(
                 ["delivered", "in_transit_delayed", "in_transit_ontime", "rejected"],
@@ -74,8 +96,15 @@ class Command(BaseCommand):
                 dispatch_time = now - timedelta(hours=random.randint(10, 96))
 
             deadline = dispatch_time + timedelta(hours=random.choice([36, 48, 60]))
-
-            # NEW: hub-dwell — only meaningful for in-transit orders
+            
+            order_placed_time = dispatch_time - timedelta(hours=random.randint(2, 8))
+            customer_name = random.choice(CUSTOMER_NAMES)
+            customer_phone = f"9{random.randint(100000000, 999999999)}"
+            city = PINCODE_TO_CITY.get(pincode, "Unknown")
+            delivery_address = f"{random.randint(1,999)}, {random.choice(['MG Road','Anna Nagar','Sector 12','Park Street','Church Street'])}, {city} - {pincode}"
+            item_name, _category = random.choice(ITEMS)
+            quantity = random.choice([1, 1, 1, 2, 3])
+            
             if outcome == "in_transit_delayed":
                 threshold = benchmarks[courier]["hub_dwell_threshold"]
                 hub_overage = random.randint(2, 10)
@@ -119,11 +148,18 @@ class Command(BaseCommand):
 
             Order.objects.create(
                 order_id=order_id, courier=courier, pincode=pincode,
-                order_value=order_value, dispatch_time=dispatch_time,
+                order_value=order_value,
+                order_placed_time=order_placed_time,           # NEW
+                dispatch_time=dispatch_time,
                 current_hub_arrival_time=current_hub_arrival_time,
                 deadline=deadline, delivery_attempt_time=attempt_time,
                 status=status, courier_reported_reason=reason,
                 call_log_made=call_made, delay_reason_true=true_reason,
+                customer_name=customer_name,                    # NEW
+                customer_phone=customer_phone,                  # NEW
+                delivery_address=delivery_address,               # NEW
+                item_name=item_name,                             # NEW
+                quantity=quantity,                               # NEW
             )
             created += 1
 
