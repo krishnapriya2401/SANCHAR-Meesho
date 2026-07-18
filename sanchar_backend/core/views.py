@@ -116,7 +116,7 @@ class RerunLiveView(APIView):
 
             subject = f"Update on your order {order_id}"
             try:
-                send_mail(subject, body, None, [email], fail_silently=False)
+                send_mail(subject, body, None, [email], fail_silently=True)
                 email_status = "sent"
             except Exception as exc:
                 email_status = f"failed: {exc}"
