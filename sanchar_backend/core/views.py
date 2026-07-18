@@ -1,5 +1,6 @@
 import os
 import threading
+import requests
 
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView, RetrieveAPIView
@@ -118,7 +119,22 @@ class RerunLiveView(APIView):
             subject = f"Update on your order {order_id}"
             def _send():
                 try:
-                    send_mail(subject, body, None, [email], fail_silently=True)
+                    sg_key = os.getenv("SENDGRID_API_KEY") or os.getenv("EMAIL_HOST_PASSWORD", "")
+                    if sg_key:
+                        requests.post(
+                            "https://api.sendgrid.com/v3/mail/send",
+                            headers={
+                                "Authorization": f"Bearer {sg_key}",
+                                "Content-Type": "application/json",
+                            },
+                            json={
+                                "personalizations": [{"to": [{"email": email}]}],
+                                "from": {"email": os.getenv("DEFAULT_FROM_EMAIL", "noreply@sanchar.com")},
+                                "subject": subject,
+                                "content": [{"type": "text/plain", "value": body}],
+                            },
+                            timeout=10,
+                        )
                 except Exception:
                     pass
             t = threading.Thread(target=_send, daemon=True)
