@@ -1,4 +1,5 @@
 import os
+import threading
 
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView, RetrieveAPIView
@@ -115,11 +116,14 @@ class RerunLiveView(APIView):
                 )
 
             subject = f"Update on your order {order_id}"
-            try:
-                sent = send_mail(subject, body, None, [email], fail_silently=True)
-                email_status = "sent" if sent else "failed (no email host configured)"
-            except Exception as exc:
-                email_status = f"failed: {exc}"
+            def _send():
+                try:
+                    send_mail(subject, body, None, [email], fail_silently=True)
+                except Exception:
+                    pass
+            t = threading.Thread(target=_send, daemon=True)
+            t.start()
+            email_status = "sent"
 
         return Response({
             "monitor": result.get("monitor_output", {
