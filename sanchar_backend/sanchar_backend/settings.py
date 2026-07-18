@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'sanchar_backend.wsgi.application'
 import re
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL:
-    m = re.match(r"postgres(?:ql)?://(.+?):(.+?)@(.+?):(\d+)/(.+?)$", DATABASE_URL)
+    m = re.match(r"postgres(?:ql)?://(.+?):(.+?)@(.+?)(?::(\d+))?/(.+?)$", DATABASE_URL)
     if m:
         DATABASES = {
             'default': {
@@ -103,7 +103,7 @@ if DATABASE_URL:
                 'USER': m.group(1),
                 'PASSWORD': m.group(2),
                 'HOST': m.group(3),
-                'PORT': m.group(4),
+                'PORT': m.group(4) if m.group(4) else '5432',
             }
         }
     else:
