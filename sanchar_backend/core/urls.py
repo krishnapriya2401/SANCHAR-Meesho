@@ -9,5 +9,5 @@ urlpatterns = [
     path("api/orders/<str:order_id>/rerun-live/", RerunLiveView.as_view()),
     path("api/aggregation/", AggregationView.as_view()),
     path("api/aggregation/approve/", ApproveCourierView.as_view()),
-    path("api/setup/", SetupView.as_view()),
+    path("api/setup/<str:step>/", SetupView.as_view()),
 ]

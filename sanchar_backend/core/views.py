@@ -148,26 +148,40 @@ class RerunLiveView(APIView):
 
 
 class SetupView(APIView):
-    """POST /api/setup/  ->  generate_data + run_pipeline (one-time setup).
-    Send JSON: {"key": "...", "force": false}
+    """POST /api/setup/generate/  ->  generate_data (lightweight, creates orders + PipelineClock).
+       POST /api/setup/pipeline/  ->  run_pipeline (heavy, runs agents on all orders).
+    Send JSON: {"key": "..."}
     """
 
-    def post(self, request):
+    def _check_key(self, request):
         key = request.data.get("key")
         expected = os.getenv("SETUP_KEY", "")
         if not expected or key != expected:
+            return None
+        return True
+
+    def post(self, request, step=None):
+        if not self._check_key(request):
             return Response({"error": "invalid key"}, status=http_status.HTTP_403_FORBIDDEN)
-        force = request.data.get("force", False)
-        if Order.objects.count() > 0 and not force:
-            return Response({"message": "data already exists, skipping"})
-        try:
-            if force:
-                call_command("flush", "--no-input")
-            call_command("generate_data")
-            call_command("run_pipeline")
-            return Response({"message": "setup complete"})
-        except Exception as e:
-            return Response({"error": str(e)}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if step == "generate":
+            if Order.objects.count() > 0:
+                return Response({"message": "data already exists — send {\"force\":true} to re-seed"})
+            try:
+                call_command("generate_data")
+                return Response({"message": "data generation complete"})
+            except Exception as e:
+                return Response({"error": str(e)}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        elif step == "pipeline":
+            try:
+                call_command("run_pipeline")
+                return Response({"message": "pipeline complete"})
+            except Exception as e:
+                return Response({"error": str(e)}, status=http_status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        else:
+            return Response({"error": "specify step: generate or pipeline"}, status=http_status.HTTP_400_BAD_REQUEST)
 
 
 class ApproveCourierView(APIView):
