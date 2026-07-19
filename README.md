@@ -68,7 +68,14 @@ Every LLM call is wrapped with a fallback: if Groq times out, rate-limits, or re
 | Hosting | Render (backend) + Vercel (frontend) |
 
  "Email pipeline exists but delivery depends on SMTP provider availability on free-tier hosts."
- 
+ Why this stack
+
+**Django + DRF **— one framework for models, REST API, and batch pipeline commands (generate_data, run_pipeline), instead of assembling an ORM, migrations, and job runner separately.
+**LangGraph **— the pipeline branches by order status and shares typed state across agents; StateGraph models that directly instead of hand-rolling a state machine.
+**Groq (Llama 3.3 70B) **— fast inference for live, per-order calls during a demo, where a visible delay matters more than marginal quality differences.
+**PostgreSQL (production) / SQLite (local) **— Postgres handles concurrent API reads while the pipeline writes results, and Render's free Postgres persists independently of the web service, surviving redeploys.
+**React + Vite + react-router-dom —** component-based views (Dashboard, Order Detail, Scorecard) with fast local iteration during a 7-day build.
+**Render + Vercel **— zero-config deploys from GitHub, free tiers sufficient for a hackathon prototype, no manual server/DNS/SSL setup needed.
 ## Project structure
 
 ```
