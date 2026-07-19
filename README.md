@@ -19,9 +19,9 @@ A fourth agent, **Aggregation**, studies patterns across *all* orders at once â€
 
 ## Architecture
 
-```
+
 ![Sanchar Pipeline Architecture](docs/sanchar_pipeline_architecture_v2.png)
-```
+
 
 Built as a real [LangGraph](https://github.com/langchain-ai/langgraph) `StateGraph` â€” a router node reads each order's status and dispatches it down the Prevent or Resolve chain; each agent is a graph node passing an evolving state object forward.
 
