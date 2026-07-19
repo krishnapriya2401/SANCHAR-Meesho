@@ -20,28 +20,7 @@ A fourth agent, **Aggregation**, studies patterns across *all* orders at once �
 ## Architecture
 
 ```
-Order status
-     │
-     ▼
-  Router ──────┬───────────────┐
-               │               │
-         in_transit      rejected / rto
-               │               │
-               ▼               ▼
-          ┌─────────┐    ┌─────────┐
-          │ Monitor │    │ Monitor │
-          └────┬────┘    └────┬────┘
-               ▼               ▼
-          ┌─────────┐    ┌─────────┐
-          │Diagnosis│    │Diagnosis│  ← only agent that calls an LLM
-          └────┬────┘    └────┬────┘
-               ▼               ▼
-          ┌─────────┐    ┌─────────┐
-          │ Action  │    │ Action  │
-          └─────────┘    └─────────┘
-
-                    Aggregation Agent
-              (runs across all orders, pandas)
+![Sanchar Pipeline Architecture](docs/sanchar_pipeline_architecture_v2.png)
 ```
 
 Built as a real [LangGraph](https://github.com/langchain-ai/langgraph) `StateGraph` — a router node reads each order's status and dispatches it down the Prevent or Resolve chain; each agent is a graph node passing an evolving state object forward.
@@ -70,12 +49,14 @@ Every LLM call is wrapped with a fallback: if Groq times out, rate-limits, or re
  "Email pipeline exists but delivery depends on SMTP provider availability on free-tier hosts."
  Why this stack
 
-**Django + DRF **— one framework for models, REST API, and batch pipeline commands (generate_data, run_pipeline), instead of assembling an ORM, migrations, and job runner separately.
-**LangGraph **— the pipeline branches by order status and shares typed state across agents; StateGraph models that directly instead of hand-rolling a state machine.
-**Groq (Llama 3.3 70B) **— fast inference for live, per-order calls during a demo, where a visible delay matters more than marginal quality differences.
-**PostgreSQL (production) / SQLite (local) **— Postgres handles concurrent API reads while the pipeline writes results, and Render's free Postgres persists independently of the web service, surviving redeploys.
-**React + Vite + react-router-dom —** component-based views (Dashboard, Order Detail, Scorecard) with fast local iteration during a 7-day build.
-**Render + Vercel **— zero-config deploys from GitHub, free tiers sufficient for a hackathon prototype, no manual server/DNS/SSL setup needed.
+## Why this stack
+
+- **Django + DRF** — one framework for models, REST API, and batch pipeline commands (`generate_data`, `run_pipeline`), instead of assembling an ORM, migrations, and job runner separately.
+- **LangGraph** — the pipeline branches by order status and shares typed state across agents; `StateGraph` models that directly instead of hand-rolling a state machine.
+- **Groq (Llama 3.3 70B)** — fast inference for live, per-order calls during a demo, where a visible delay matters more than marginal quality differences.
+- **PostgreSQL (production) / SQLite (local)** — Postgres handles concurrent API reads while the pipeline writes results, and Render's free Postgres persists independently of the web service, surviving redeploys.
+- **React + Vite + react-router-dom** — component-based views (Dashboard, Order Detail, Scorecard) with fast local iteration during a 7-day build.
+- **Render + Vercel** — zero-config deploys from GitHub, free tiers sufficient for a hackathon prototype, no manual server/DNS/SSL setup needed.
 ## Project structure
 
 ```
