@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.core.cache import cache
 from core.models import Order
 from core.agents.groq_client import ask_groq_json
+from core.agents.monitor import get_reference_time
 
 PINCODE_TO_REGION = {
     "600001": "Chennai", "641001": "Coimbatore", "560001": "Bengaluru",
@@ -49,7 +50,7 @@ def _regional_risk():
 
 
 def _delay_distribution():
-    now = timezone.now()
+    now = get_reference_time()
     orders = Order.objects.filter(
         monitor_flagged=True, current_hub_arrival_time__isnull=False
     ).values("current_hub_arrival_time")
