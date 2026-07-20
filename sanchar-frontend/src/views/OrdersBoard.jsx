@@ -68,6 +68,7 @@ export default function OrdersBoard() {
     <div className={styles.page}>
       <h1 className={styles.title}>Order Board</h1>
       <p className={styles.subtitle}>Live pipeline verdicts across every active COD order.</p>
+      <p className={styles.hint}>Click any order card to investigate — run the AI pipeline and see agent decisions live.</p>
 
       {!loading && <StatsBar orders={orders} />}
 
