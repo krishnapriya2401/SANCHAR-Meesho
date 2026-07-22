@@ -17,5 +17,7 @@ export const fetchAggregation = () =>
   api.get("/api/aggregation/").then((r) => r.data);
 export const rerunLive = (orderId, email) =>
   api.post(`/api/orders/${orderId}/rerun-live/`, { email }).then((r) => r.data);
+/*
 export const approveCourier = (courier, approved = true) =>
   api.post("/api/aggregation/approve/", { courier, approved }).then((r) => r.data);
+*/

@@ -202,7 +202,7 @@ class SetupView(APIView):
 
         else:
             return Response({"error": "specify step: generate or pipeline"}, status=http_status.HTTP_400_BAD_REQUEST)
-
+"""
 
 class ApproveCourierView(APIView):
 
@@ -219,4 +219,4 @@ class ApproveCourierView(APIView):
             defaults={"approved": approved},
         )
         return Response({"courier": courier, "approved": approved})
-       
+     """  
