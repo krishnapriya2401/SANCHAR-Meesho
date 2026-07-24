@@ -18,6 +18,11 @@ from core.agents.monitor import order_to_state
 from core.agents.graph import build_graph
 
 
+class HealthCheckView(APIView):
+    def get(self, request):
+        return Response({"status": "ok"}, status=http_status.HTTP_200_OK)
+
+
 class OrderListView(ListAPIView):
     """
     GET /api/orders/               -> all orders
