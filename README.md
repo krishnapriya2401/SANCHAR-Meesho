@@ -147,7 +147,6 @@ npm run dev
 | GET | `/api/orders/:id/` | Full order detail, including agent trace |
 | POST | `/api/orders/:id/rerun-live/` | Re-invoke the real pipeline live on one order |
 | GET | `/api/aggregation/` | Scorecard and cross-order insights |
-| POST | `/api/aggregation/approve/` | Mark a flagged courier reviewed (`approved: true/false`, supports undo) |
 | POST | `/api/setup/` | Seed + run pipeline (key-gated, used since Render's free tier has no shell) |
 
 ## Environment variables
